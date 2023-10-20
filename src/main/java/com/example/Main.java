@@ -6,10 +6,6 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 
 public class Main {
     public static void main(String[] args) throws TelegramApiException {
-        
-        
-
-        
         TelegramBotsApi BotsApi = new TelegramBotsApi(DefaultBotSession.class);
 
         try {
