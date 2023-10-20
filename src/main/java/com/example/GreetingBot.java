@@ -15,7 +15,6 @@ import java.util.HashSet;
 
 public class GreetingBot extends TelegramLongPollingBot {
     public String nameSearchPack = "";
-    private MapPack combotPack;
     private Set<Long> chatIds = new HashSet<>();
 
     @Override
@@ -36,12 +35,12 @@ public class GreetingBot extends TelegramLongPollingBot {
     
                 Website combotSite = new Website("https://combot.org/telegram/stickers?q=" + nameSearchPack, "combot");
                 Website chpicSite = new Website("https://chpic.su/ru/stickers/search/" + nameSearchPack + "/?searchModule=stickers", "chpic");
-                combotPack = new MapPack(combotSite);
+                MapPack combotPack = new MapPack(combotSite);
                 MapPack chpicPack = new MapPack(chpicSite);
                 sendTextMessage(message.getChatId().toString(), "Результат поиска:\n");
     
                 int messageCount1 = 0; // Переменная для отслеживания количества отправленных сообщений
-
+                                                //Циклы могут быть сокращены
                 for (int i = 0; i < combotPack.SizePack() && messageCount1 < 5; i++) {
                     String packName = combotPack.GetNamePack(i);
                     String packUrl = combotPack.GetUrlPack(i);
