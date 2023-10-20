@@ -48,7 +48,7 @@ public class GreetingBot extends TelegramLongPollingBot {
                     String packUrl = combotPack.GetUrlPack(i);
                     String imgUrls = combotPack.GetUrlImgPack(i);
 
-                    String messageText = "Name: " + packName + "\nURL pack: " + packUrl;
+                    String messageText = "Имя: " + packName + "\nСсылка на скачивание: " + packUrl;
                     sendTextMessage(message.getChatId().toString(), messageText);
 
                     // Отправляем стикер из стикерпака
@@ -63,7 +63,7 @@ public class GreetingBot extends TelegramLongPollingBot {
                     String packUrl = chpicPack.GetUrlPack(i);
                     String imgUrls = chpicPack.GetUrlImgPack(i);
 
-                    String messageText = "Name: " + packName + "\nURL pack: " + packUrl;
+                    String messageText = "Имя: " + packName + "\nСсылка на скачивание: " + packUrl;
                     sendTextMessage(message.getChatId().toString(), messageText);
 
                     // Отправляем стикер из стикерпака
