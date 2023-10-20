@@ -3,7 +3,7 @@ package com.example;
 public class App 
 {
     public static void main( String[] args ) {
-        String nameSearchPack = "papich123";
+        String nameSearchPack = "papich123214";
         Website combotSite = new Website("https://combot.org/telegram/stickers?q=" + nameSearchPack, "combot");
         // Website chpicSite = new Website("https://chpic.su/ru/stickers/search/" + nameSearchPack + "/?searchModule=stickers", "chpic");
         
