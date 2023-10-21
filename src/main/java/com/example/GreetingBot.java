@@ -17,12 +17,21 @@ public class GreetingBot extends TelegramLongPollingBot {
     public String nameSearchPack = "";
     private MapPack combotPack;
     private Set<Long> chatIds = new HashSet<>();
-
+    private UserRequestsLogger requestsLogger;
+    public GreetingBot() {
+        this("user_requests.log"); // По умолчанию используется файл "user_requests.log"
+    }
+    public GreetingBot(String logFilePath) {
+        requestsLogger = new UserRequestsLogger(logFilePath);
+    }
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             Message message = update.getMessage();
             Long chatId = message.getChatId();
+            String username = message.getFrom().getUserName(); // Получение username пользователя
+            String userRequest = message.getText();
+            requestsLogger.logUserRequest(username, userRequest);
             if (message.isCommand() && message.getText().equals("/start")) {
                 sendWelcomeMessage(chatId.toString());
             } else {
@@ -32,14 +41,14 @@ public class GreetingBot extends TelegramLongPollingBot {
                     
                 }
                 nameSearchPack = message.getText();
+                
                 sendTextMessage(chatId.toString(), "Вы выбрали слово для поиска: " + nameSearchPack);
-    
                 Website combotSite = new Website("https://combot.org/telegram/stickers?q=" + nameSearchPack, "combot");
                 Website chpicSite = new Website("https://chpic.su/ru/stickers/search/" + nameSearchPack + "/?searchModule=stickers", "chpic");
                 combotPack = new MapPack(combotSite);
                 MapPack chpicPack = new MapPack(chpicSite);
                 sendTextMessage(message.getChatId().toString(), "Результат поиска:\n");
-    
+                
                 int messageCount1 = 0; // Переменная для отслеживания количества отправленных сообщений
 
                 for (int i = 0; i < combotPack.SizePack() && messageCount1 < 5; i++) {
@@ -81,7 +90,10 @@ public class GreetingBot extends TelegramLongPollingBot {
         }
     }
     
-    
+    public void close() {
+        // Вызовите этот метод для закрытия файла перед завершением работы бота
+        requestsLogger.close();
+    }
     private void sendStickerFromPack(String chatId, String stickerUrl) {
         SendSticker sendSticker = new SendSticker();
         sendSticker.setChatId(chatId);
