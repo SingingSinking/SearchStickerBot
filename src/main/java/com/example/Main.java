@@ -6,7 +6,7 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 
 public class Main {
     public static void main(String[] args) throws TelegramApiException {
-        String logFilePath = "user_requests.log"; // Заменить путь на путь к вашему файлу
+        String logFilePath = "user_requests.log"; // путь к файлу
         GreetingBot bot = new GreetingBot(logFilePath);
         TelegramBotsApi BotsApi = new TelegramBotsApi(DefaultBotSession.class);
 

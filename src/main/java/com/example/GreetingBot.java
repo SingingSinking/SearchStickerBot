@@ -18,12 +18,17 @@ public class GreetingBot extends TelegramLongPollingBot {
     private MapPack combotPack;
     private Set<Long> chatIds = new HashSet<>();
     private UserRequestsLogger requestsLogger;
+
+    // Конструктор по умолчанию, использует файл "user_requests.log" для записи запросов
     public GreetingBot() {
-        this("user_requests.log"); // По умолчанию используется файл "user_requests.log"
+        this("user_requests.log");
     }
+
+    // Конструктор, позволяющий указать путь к файлу лога запросов
     public GreetingBot(String logFilePath) {
         requestsLogger = new UserRequestsLogger(logFilePath);
     }
+
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
@@ -31,24 +36,24 @@ public class GreetingBot extends TelegramLongPollingBot {
             Long chatId = message.getChatId();
             String username = message.getFrom().getUserName(); // Получение username пользователя
             String userRequest = message.getText();
-            requestsLogger.logUserRequest(username, userRequest);
+            requestsLogger.logUserRequest(username, userRequest); // Запись запроса пользователя в лог
+
             if (message.isCommand() && message.getText().equals("/start")) {
                 sendWelcomeMessage(chatId.toString());
             } else {
                 // Добавляем или удаляем идентификатор чата в зависимости от вашей логики
                 if (message.getText().equals("/start")) {
                     chatIds.add(chatId);
-                    
                 }
                 nameSearchPack = message.getText();
-                
                 sendTextMessage(chatId.toString(), "Вы выбрали слово для поиска: " + nameSearchPack);
+
                 Website combotSite = new Website("https://combot.org/telegram/stickers?q=" + nameSearchPack, "combot");
                 Website chpicSite = new Website("https://chpic.su/ru/stickers/search/" + nameSearchPack + "/?searchModule=stickers", "chpic");
                 combotPack = new MapPack(combotSite);
                 MapPack chpicPack = new MapPack(chpicSite);
                 sendTextMessage(message.getChatId().toString(), "Результат поиска:\n");
-                
+
                 int messageCount1 = 0; // Переменная для отслеживания количества отправленных сообщений
 
                 for (int i = 0; i < combotPack.SizePack() && messageCount1 < 5; i++) {
@@ -89,27 +94,29 @@ public class GreetingBot extends TelegramLongPollingBot {
             }
         }
     }
-    
+
     public void close() {
         // Вызовите этот метод для закрытия файла перед завершением работы бота
         requestsLogger.close();
     }
+
     private void sendStickerFromPack(String chatId, String stickerUrl) {
         SendSticker sendSticker = new SendSticker();
         sendSticker.setChatId(chatId);
         sendSticker.setSticker(new InputFile(stickerUrl)); // Устанавливаем URL стикера
-    
+
         try {
             execute(sendSticker);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }
+
     private void sendWelcomeMessage(String chatId) {
         String welcomeText = "Добро пожаловать! Я бот для поиска стикеров. Введите слово для поиска.";
         sendTextMessage(chatId, welcomeText);
     }
-    
+
     private void sendTextMessage(String chatId, String text) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
