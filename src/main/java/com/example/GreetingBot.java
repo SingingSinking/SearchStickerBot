@@ -52,20 +52,12 @@ public class GreetingBot extends TelegramLongPollingBot {
                 MapPack combotPack = new MapPack(combotSite);
                 MapPack chpicPack = new MapPack(chpicSite);
                 sendTextMessage(message.getChatId().toString(), "Результат поиска:\n");
-<<<<<<< HEAD
     
                 int MessageLimit = 5; // Переменная ограничивающая количествво отправляемых стикеров
                                                 //Циклы могут быть сокращены
                 for (int i = 0; i < MessageLimit; i++) {
                     CheckNullPack(combotPack, message);
 
-=======
-
-                int MessageLimit = 5; // Переменная ограничивающая количествво отправляемых стикеров
-                                //Циклы могут быть сокращены
-                for (int i = 0; i < MessageLimit; i++) {
-                    CheckNullPack(combotPack, message);
->>>>>>> 29f45acec6571f9e9c007ed9c939c69d2c9f5d4e
                     String packName = combotPack.GetNamePack(i);
                     String packUrl = combotPack.GetUrlPack(i);
                     String imgUrls = combotPack.GetUrlImgPack(i);
@@ -75,18 +67,11 @@ public class GreetingBot extends TelegramLongPollingBot {
 
                     // Отправляем стикер из стикерпака
                     sendStickerFromPack(message.getChatId().toString(), imgUrls);
-<<<<<<< HEAD
-
-=======
->>>>>>> 29f45acec6571f9e9c007ed9c939c69d2c9f5d4e
                 }
 
                 for (int i = 0; i < MessageLimit; i++) {
                     CheckNullPack(chpicPack, message);
-<<<<<<< HEAD
 
-=======
->>>>>>> 29f45acec6571f9e9c007ed9c939c69d2c9f5d4e
                     String packName = chpicPack.GetNamePack(i);
                     String packUrl = chpicPack.GetUrlPack(i);
                     String imgUrls = chpicPack.GetUrlImgPack(i);
@@ -96,13 +81,6 @@ public class GreetingBot extends TelegramLongPollingBot {
 
                     // Отправляем стикер из стикерпака
                     sendStickerFromPack(message.getChatId().toString(), imgUrls);
-<<<<<<< HEAD
-                }
-            }
-        }
-    }
-    
-=======
 
                 }
 
@@ -114,16 +92,11 @@ public class GreetingBot extends TelegramLongPollingBot {
         // Вызовите этот метод для закрытия файла перед завершением работы бота
         requestsLogger.close();
     }
->>>>>>> 29f45acec6571f9e9c007ed9c939c69d2c9f5d4e
     private void CheckNullPack(MapPack pack, Message message){
         if (pack.SizePack() == 0) {
             sendTextMessage(message.getChatId().toString(), "По вашему запросу не обнаружены стикеры :(");
         }
     }
-<<<<<<< HEAD
-    
-=======
->>>>>>> 29f45acec6571f9e9c007ed9c939c69d2c9f5d4e
     private void sendStickerFromPack(String chatId, String stickerUrl) {
         SendSticker sendSticker = new SendSticker();
         sendSticker.setChatId(chatId);
