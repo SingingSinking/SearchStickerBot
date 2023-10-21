@@ -14,9 +14,11 @@ import java.util.HashSet;
 
 
 public class GreetingBot extends TelegramLongPollingBot {
+
     public String nameSearchPack = "";
     private Set<Long> chatIds = new HashSet<>();
     private UserRequestsLogger requestsLogger;
+    final int MessageLimit = 5; // Константа ограничивающая количествво отправляемых стикеров
 
     // Конструктор по умолчанию, использует файл "user_requests.log" для записи запросов
     public GreetingBot() {
@@ -31,14 +33,17 @@ public class GreetingBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
+
             Message message = update.getMessage();
             Long chatId = message.getChatId();
             String username = message.getFrom().getUserName(); // Получение username пользователя
             String userRequest = message.getText();
             requestsLogger.logUserRequest(username, userRequest); // Запись запроса пользователя в лог
 
+
             if (message.isCommand() && message.getText().equals("/start")) {
                 sendWelcomeMessage(chatId.toString());
+                
             } else {
                 // Добавляем или удаляем идентификатор чата в зависимости от вашей логики
                 if (message.getText().equals("/start")) {
@@ -52,9 +57,8 @@ public class GreetingBot extends TelegramLongPollingBot {
                 MapPack combotPack = new MapPack(combotSite);
                 MapPack chpicPack = new MapPack(chpicSite);
                 sendTextMessage(message.getChatId().toString(), "Результат поиска:\n");
-    
-                int MessageLimit = 5; // Переменная ограничивающая количествво отправляемых стикеров
-                                                //Циклы могут быть сокращены
+                
+                //Циклы могут быть сокращены если не требуется разделение на конкретные сайты
                 for (int i = 0; i < MessageLimit; i++) {
                     CheckNullPack(combotPack, message);
 
@@ -64,7 +68,6 @@ public class GreetingBot extends TelegramLongPollingBot {
 
                     String messageText = "Имя: " + packName + "\nСсылка на скачивание: " + packUrl;
                     sendTextMessage(message.getChatId().toString(), messageText);
-
                     // Отправляем стикер из стикерпака
                     sendStickerFromPack(message.getChatId().toString(), imgUrls);
                 }
@@ -78,7 +81,6 @@ public class GreetingBot extends TelegramLongPollingBot {
 
                     String messageText = "Имя: " + packName + "\nСсылка на скачивание: " + packUrl;
                     sendTextMessage(message.getChatId().toString(), messageText);
-
                     // Отправляем стикер из стикерпака
                     sendStickerFromPack(message.getChatId().toString(), imgUrls);
 
@@ -92,11 +94,13 @@ public class GreetingBot extends TelegramLongPollingBot {
         // Вызовите этот метод для закрытия файла перед завершением работы бота
         requestsLogger.close();
     }
+
     private void CheckNullPack(MapPack pack, Message message){
         if (pack.SizePack() == 0) {
             sendTextMessage(message.getChatId().toString(), "По вашему запросу не обнаружены стикеры :(");
         }
     }
+    
     private void sendStickerFromPack(String chatId, String stickerUrl) {
         SendSticker sendSticker = new SendSticker();
         sendSticker.setChatId(chatId);
