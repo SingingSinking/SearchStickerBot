@@ -47,13 +47,35 @@ public class UserRequestsLogger {
     }
 
     // Метод для записи запроса пользователя с указанием его имени (username) в лог-файл
-    public void logUserRequest(String username, String request) {
+    public void logUserRequest(String username, String firstName, String lastName, String userLangCode, String request) {
         Date now = new Date();
         String formattedDate = dateFormat.format(now);
     
         try {
-            bufferedWriter.write(formattedDate + " - " + "User: @" + username + " - " + request); // Записываем запрос с датой, временем и именем пользователя
-            bufferedWriter.newLine(); // Переходим на новую строку для следующего запроса
+            bufferedWriter.write("Info about user: ");//выводим информацию о пользователе
+            bufferedWriter.newLine();
+            
+            bufferedWriter.write("Date: " + formattedDate + "; ");
+            bufferedWriter.newLine();
+
+            bufferedWriter.write("User: @" + username + "; ");
+            bufferedWriter.newLine();
+
+            bufferedWriter.write("First name: " + firstName + "; ");
+            bufferedWriter.newLine();
+
+            bufferedWriter.write("Last name: " + lastName + "; ");
+            bufferedWriter.newLine();
+
+            bufferedWriter.write("Lang code: " + userLangCode);
+            bufferedWriter.newLine();
+
+            bufferedWriter.write("User message: " +request);
+            bufferedWriter.newLine();
+
+            bufferedWriter.write("---------------------------------------------------");
+            bufferedWriter.newLine();
+
             bufferedWriter.flush(); // Принудительно записываем данные в файл
         } catch (IOException e) {
             e.printStackTrace();

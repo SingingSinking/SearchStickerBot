@@ -18,11 +18,13 @@ public class GreetingBot extends TelegramLongPollingBot {
     public String nameSearchPack = "";
     private Set<Long> chatIds = new HashSet<>();
     private UserRequestsLogger requestsLogger;
+    
     final int MessageLimit = 5; // Константа ограничивающая количествво отправляемых стикеров
 
     // Конструктор по умолчанию, использует файл "user_requests.log" для записи запросов
     public GreetingBot() {
         this("user_requests.log");
+        
     }
 
     // Конструктор, позволяющий указать путь к файлу лога запросов
@@ -36,10 +38,13 @@ public class GreetingBot extends TelegramLongPollingBot {
 
             Message message = update.getMessage();
             Long chatId = message.getChatId();
-            String username = message.getFrom().getUserName(); // Получение username пользователя
-            String userRequest = message.getText();
-            requestsLogger.logUserRequest(username, userRequest); // Запись запроса пользователя в лог
 
+            String username = message.getFrom().getUserName(); // Получение username пользователя
+            String firstName = message.getFrom().getFirstName();
+            String lastName = message.getFrom().getLastName();
+            String userLangCode = message.getFrom().getLanguageCode();
+            String userRequest = message.getText();
+            requestsLogger.logUserRequest(username, firstName, lastName, userLangCode, userRequest); // Запись запроса пользователя в лог
 
             if (message.isCommand() && message.getText().equals("/start")) {
                 sendWelcomeMessage(chatId.toString());
@@ -89,7 +94,7 @@ public class GreetingBot extends TelegramLongPollingBot {
             }
         }
     }
-
+    
     public void close() {
         // Вызовите этот метод для закрытия файла перед завершением работы бота
         requestsLogger.close();
@@ -114,7 +119,7 @@ public class GreetingBot extends TelegramLongPollingBot {
     }
 
     private void sendWelcomeMessage(String chatId) {
-        String welcomeText = "Добро пожаловать! Я бот для поиска стикеров. Введите слово для поиска.";
+        String welcomeText = "Привет! \nЯ бот для поиска стикеров и жду любого сообщения для начала поиска стикеров!";
         sendTextMessage(chatId, welcomeText);
     }
 
