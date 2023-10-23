@@ -70,7 +70,7 @@ public class GreetingBot extends TelegramLongPollingBot {
                     break;
                 case "/searchsticker":
                     sendTextMessage(chatId.toString(),  "Введите название стикер-пака: ");
-                    String nameSearchPack = update.getMessage().getText();
+                    String nameSearchPack = message.getText();
                     sendTextMessage(chatId.toString(), "Ищем стикеры по вашему запросу... ");
 
                     SearchSticker(message, chatId, nameSearchPack);
