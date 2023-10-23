@@ -3,7 +3,6 @@ package com.example;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendSticker;
-import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -20,7 +19,7 @@ public class GreetingBot extends TelegramLongPollingBot {
     private Set<Long> chatIds = new HashSet<>();
     private UserRequestsLogger requestsLogger;
     
-    final int MessageLimit = 5; // Константа ограничивающая количествво отправляемых стикеров
+    final int MessageLimit = 20; // Константа ограничивающая количествво отправляемых стикеров
 
     // Конструктор по умолчанию, использует файл "user_requests.log" для записи запросов
     public GreetingBot() {
@@ -45,7 +44,9 @@ public class GreetingBot extends TelegramLongPollingBot {
             String lastName = message.getFrom().getLastName();
             String userLangCode = message.getFrom().getLanguageCode();
             String userRequest = message.getText();
-            requestsLogger.logUserRequest(username, firstName, lastName, userLangCode, userRequest); // Запись запроса пользователя в лог
+            requestsLogger.logUserRequest(username, firstName, lastName, userLangCode, userRequest); // Запись пользователя в лог
+            
+            
             if (message.isCommand() && message.getText().equals("/start")) {
                 sendWelcomeMessage(chatId.toString());
                 
@@ -57,40 +58,30 @@ public class GreetingBot extends TelegramLongPollingBot {
                 nameSearchPack = message.getText();
                 sendTextMessage(chatId.toString(), "Ищем стикеры по вашему запросу... ");
 
+                
                 Website combotSite = new Website("https://combot.org/telegram/stickers?q=" + nameSearchPack, "combot");
                 Website chpicSite = new Website("https://chpic.su/ru/stickers/search/" + nameSearchPack + "/?searchModule=stickers", "chpic");
-                MapPack combotPack = new MapPack(combotSite);
-                MapPack chpicPack = new MapPack(chpicSite);
                 
-                //Циклы могут быть сокращены если не требуется разделение на конкретные сайты
-                for (int i = 0; i < MessageLimit; i++) {
-                    CheckNullPack(combotPack, message);
+                    //Создаем паки по отдельности
+                // MapPack combotPack = new MapPack(combotSite);
+                // MapPack chpicPack = new MapPack(chpicSite);
+                
+                    //Создаем общий пак который содержит все стикеры из двух сайтов.
+                    //Общий пак содержит сначала стикеры из первого, а потом из второго сайта
+                MapPack allPack = new MapPack(chpicSite, combotSite);
 
-                    String packName = combotPack.GetNamePack(i);
-                    String packUrl = combotPack.GetUrlPack(i);
-                    String imgUrl = combotPack.GetUrlImgPack(i);
-                    
+                for (int i = 0; i < MessageLimit; i++) {
+                    CheckNullPack(allPack, message);
+
+                    String packName = allPack.GetNamePack(i);
+                    String packUrl = allPack.GetUrlPack(i);
+                    String imgUrl = allPack.GetUrlImgPack(i);
 
                     // Отправляем стикер из стикерпака
                     sendStickerFromPack(message.getChatId().toString(), imgUrl);
 
                     String messageText = "Имя: " + packName + "\nСсылка на скачивание: " + packUrl;
                     sendTextMessage(message.getChatId().toString(), messageText);
-                }
-
-                for (int i = 0; i < MessageLimit; i++) {
-                    CheckNullPack(chpicPack, message);
-
-                    String packName = chpicPack.GetNamePack(i);
-                    String packUrl = chpicPack.GetUrlPack(i);
-                    String imgUrl = chpicPack.GetUrlImgPack(i);
-
-                    // Отправляем стикер из стикерпака
-                    sendStickerFromPack(message.getChatId().toString(), imgUrl);
-                    
-                    String messageText = "Имя: " + packName + "\nСсылка на скачивание: " + packUrl;
-                    sendTextMessage(message.getChatId().toString(), messageText);
-
                 }
 
             }
@@ -102,12 +93,18 @@ public class GreetingBot extends TelegramLongPollingBot {
         requestsLogger.close();
     }
 
+    private void CheckNullPack(MapPack pack1, MapPack pack2, Message message){
+        if (pack1.SizePack() == 0 && pack2.SizePack() == 0) {
+            sendTextMessage(message.getChatId().toString(), "По вашему запросу не обнаружены стикеры :(\nВозможно, вам стоит немного изменить текст сообщения или попробовать другой язык");
+        }
+    }
+    
     private void CheckNullPack(MapPack pack, Message message){
         if (pack.SizePack() == 0) {
             sendTextMessage(message.getChatId().toString(), "По вашему запросу не обнаружены стикеры :(\nВозможно, вам стоит немного изменить текст сообщения или попробовать другой язык");
         }
     }
-    
+
     private void sendStickerFromPack(String chatId, String stickerUrl) {
         SendSticker sendSticker = new SendSticker();
         sendSticker.setChatId(chatId);
