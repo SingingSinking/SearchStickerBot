@@ -6,7 +6,7 @@ public class MapPack {
     // Contains links to stickers
     private ArrayList<Pack> packs = new ArrayList<Pack>();
 
-    // Constructor
+    // Constructor 1 (Add)
     public MapPack(Website site) {
         switch (site.GetNamePage()) {
             case "combot":
@@ -17,11 +17,20 @@ public class MapPack {
                 ChpicFillPack(site);
                 break;
 
-            // Add site here
+            // Add site method here
+            // case "siteName":
+            //     MethodSite;
+            //     break;
 
             default:
                 break;
         }
+    }
+    // Constructor 2 
+    public MapPack(Website site1, Website site2) {
+        ChpicFillPack(site1);
+        CombotFillPack(site2);
+        // Add site method here
     }
 
     private void CombotFillPack(Website htmlDom) {
@@ -71,7 +80,7 @@ public class MapPack {
         }
     }
     // Add new parse method here
-
+    
     // public methods
     public String GetUrlPack(int index) {
         return packs.get(index).GetUrl();
