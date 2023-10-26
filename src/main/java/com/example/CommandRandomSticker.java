@@ -12,7 +12,8 @@ public class CommandRandomSticker implements Action{
         var msg = update.getMessage();
         var chatId = msg.getChatId().toString();
 
-        //Создаем массив из 100 рандомных слов
+        //Создаем массив из countWords рандомных слов
+        //При значении больше 200, начинают возникать сбои в работе 
         ArrayList<String> randomWords = GetRandomWord();
 
         //Поиск пака по первому слову
@@ -27,34 +28,37 @@ public class CommandRandomSticker implements Action{
                 combotSite = new Website("https://combot.org/telegram/stickers?q=" + word, "combot");
                 chpicSite = new Website("https://chpic.su/ru/stickers/search/" + word + "/?searchModule=stickers", "chpic");
                 allPack = new MapPack(chpicSite, combotSite);
-
+                System.out.println(allPack.GetNamePack(0));
                 if (allPack.SizePack()!=0) break;
             }
-            //Если после подстановки 100 слов не нашлись паки, выводим первый пак по запросу anime (Крайне редкий шанс что такое произойдет)
+            //Если после подстановки countWords слов не нашлись паки, 
+            //выводим первый пак по запросу anime (Крайне редкий шанс что такое произойдет при большом countWords)
             combotSite = new Website("https://combot.org/telegram/stickers?q=" + "anime", "combot");
             chpicSite = new Website("https://chpic.su/ru/stickers/search/" + "anime" + "/?searchModule=stickers", "chpic");
             allPack = new MapPack(chpicSite, combotSite);
         }
-
+        //System.out.println(allPack.SizePack());
         var out = new StringBuilder();
+        out.append("Новый стикер-пак для вас 😋:").append("\n");
         out.append("Название: ").append(allPack.GetNamePack(0)).append("\n");
         out.append("Ссылка на добавление: ").append(allPack.GetUrlPack(0)).append("\n");
+
 
         return new SendMessage(chatId, out.toString());
     }
 
     private ArrayList<String> GetRandomWord() {
         //Сайт с рандомными словами (каждый раз разные слова по одной и той же ссылке)
-        Website sanstvSite = new Website("https://sanstv.ru/randomWord/lang-en/strong-2/count-100/word-%3F%3F%3F%3F%3F%3F", "sanstv");
+        Website kreeklySite = new Website("https://www.kreekly.com/random/noun/", "kreekly");
 
         ArrayList<String> words = new ArrayList<>();
-        if (sanstvSite.GetAllHtmlPage() != null){
+        if (kreeklySite.GetAllHtmlPage() != null){
             //System.out.println(sanstvSite.GetAllHtmlPage().getElementsByTag("li").size());
-            int countWords = sanstvSite.GetAllHtmlPage().getElementsByTag("li").size();
+            int countWords = kreeklySite.GetAllHtmlPage().getElementsByClass("dict-word").size();
             for (int i = 0; i<countWords; i++){
                 String word =
-                sanstvSite.GetAllHtmlPage().getElementsByTag("li").get(i).child(0).text();
-                //System.out.println(word);
+                kreeklySite.GetAllHtmlPage().getElementsByClass("dict-word").get(i).child(2).text();
+                System.out.println(word);
                 words.add(word);
             }
         }
