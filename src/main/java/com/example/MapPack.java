@@ -6,7 +6,7 @@ public class MapPack {
     // Contains links to stickers
     private ArrayList<Pack> packs = new ArrayList<Pack>();
 
-    // Constructor 1 (Add)
+    // Constructor 1 
     public MapPack(Website site) {
         switch (site.GetNamePage()) {
             case "combot":

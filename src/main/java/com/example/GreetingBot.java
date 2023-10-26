@@ -70,13 +70,14 @@ public class GreetingBot extends TelegramLongPollingBot {
                     break;
                 case "/searchsticker":
                     sendTextMessage(chatId.toString(),  "Введите название стикер-пака: ");
-                    String nameSearchPack = message.getText();
+                    String nameSearchPack = update.getMessage().getText();
+                    
                     sendTextMessage(chatId.toString(), "Ищем стикеры по вашему запросу... ");
 
                     SearchSticker(message, chatId, nameSearchPack);
                     break;
                 default:
-                    sendTextMessage(chatId.toString(), "Данная команда не работает:( ");
+                    sendTextMessage(chatId.toString(), "Данная команда не доступна:( ");
                     break;
             }
 
@@ -116,10 +117,6 @@ public class GreetingBot extends TelegramLongPollingBot {
         }
     }
 
-    public void close() {
-        // Вызовите этот метод для закрытия файла перед завершением работы бота
-        requestsLogger.close();
-    }
 
     private void CheckNullPack(MapPack pack1, MapPack pack2, Message message){
         if (pack1.SizePack() == 0 && pack2.SizePack() == 0) {
@@ -146,7 +143,7 @@ public class GreetingBot extends TelegramLongPollingBot {
     }
 
     private void sendWelcomeMessage(String chatId) {
-        String welcomeText = "Привет! \nЯ бот для поиска стикеров\nВыбери действие:";
+        String welcomeText = "Привет! \nЯ бот для поиска стикеров\nВыбери действие из списка меню:";
         sendTextMessage(chatId, welcomeText);
     }
 
@@ -160,6 +157,13 @@ public class GreetingBot extends TelegramLongPollingBot {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    
+    public void close() {
+        // Вызовите этот метод для закрытия файла перед завершением работы бота
+        requestsLogger.close();
     }
 
     @Override
