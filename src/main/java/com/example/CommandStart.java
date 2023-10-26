@@ -4,6 +4,8 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import com.vdurmont.emoji.EmojiParser;
+
 
 public class CommandStart implements Action {
 
@@ -14,9 +16,9 @@ public class CommandStart implements Action {
         var msg = update.getMessage();
         var chatId = msg.getChatId().toString();
         var out = new StringBuilder();
-        out.append("Привет!").append("\n").
-        append("Я бот для поиска стикеров.").append("\n").
-        append("Для использования выберите действие из списка меню.");
+        out.append("Привет! 😀").append("\n\n").
+        append("Я бот для поиска стикеров 😎").append("\n\n").
+        append("Для использования выберите действие из списка меню 🔥🔥");
         return new SendMessage(chatId, out.toString());
     }
 

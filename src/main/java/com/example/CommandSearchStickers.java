@@ -17,7 +17,7 @@ public class CommandSearchStickers  implements Action {
     public BotApiMethod handle(Update update) {
         var msg = update.getMessage();
         var chatId = msg.getChatId().toString();
-        var text = "Введите название пака: ";
+        var text = "Введите название набора";
         return new SendMessage(chatId, text);
     }
 
