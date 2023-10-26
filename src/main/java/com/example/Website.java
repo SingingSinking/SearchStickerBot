@@ -9,16 +9,18 @@ public class Website {
     
     private String url;
     private String name;
-    private Document htmlCode;
+    private Document htmlCode = null;
     
     //Constructor
     public Website(String url, String site){
         this.url = url;
         name = site;
         htmlCode = FillHtml(url);
+        if ( htmlCode == null) System.out.println("Не удалось получить информацию с сайта " + site + ". Возможно сайт упал");
     }
     
     private Document FillHtml(String url){
+        
         try {
             Document doc = Jsoup.connect(url).
                 userAgent("Chrome").
