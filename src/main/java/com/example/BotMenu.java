@@ -30,6 +30,7 @@ public class BotMenu extends TelegramLongPollingBot {
         List<BotCommand> listOfButtonsMenu = new ArrayList<>();
         listOfButtonsMenu.add(new BotCommand("/start", "Приветственное сообщение"));
         listOfButtonsMenu.add(new BotCommand("/search", "Начать поиск стикер-пака"));
+        listOfButtonsMenu.add(new BotCommand("/randomsticker", "Случайный стикер-пак"));
         listOfButtonsMenu.add(new BotCommand("/botinfo", "Информация о боте"));
         try {
             this.execute(new SetMyCommands(listOfButtonsMenu, new BotCommandScopeDefault(), null));
@@ -42,7 +43,7 @@ public class BotMenu extends TelegramLongPollingBot {
 
     public void onUpdateReceived(Update update) {
         if (update.hasMessage()) {
-
+            
             AddUserInfoToLog(update);
             String key = update.getMessage().getText();
             String chatId = update.getMessage().getChatId().toString();
@@ -65,7 +66,8 @@ public class BotMenu extends TelegramLongPollingBot {
         String lastName = update.getMessage().getFrom().getLastName();
         String userLangCode =  update.getMessage().getFrom().getLanguageCode();
         String userRequest =  update.getMessage().getText();
-        requestsLogger.logUserRequest(username, firstName, lastName, userLangCode, userRequest); // Запись пользователя в лог
+        String chatId = update.getMessage().getChatId().toString();
+        requestsLogger.logUserRequest(username, firstName, lastName, chatId, userLangCode, userRequest); // Запись пользователя в лог
     }
 
     private void send(BotApiMethod msg) {

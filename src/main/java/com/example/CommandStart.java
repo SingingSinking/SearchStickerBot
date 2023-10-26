@@ -17,8 +17,8 @@ public class CommandStart implements Action {
         var chatId = msg.getChatId().toString();
         var out = new StringBuilder();
         out.append("Привет! 😀").append("\n\n").
-        append("Я бот для поиска стикеров 😎").append("\n\n").
-        append("Для использования выберите действие из списка меню 🔥🔥");
+        append("Я бот для поиска стикеров 😎").append("\n").
+        append("Для использования выберите действие из списка меню 🔥");
         return new SendMessage(chatId, out.toString());
     }
 

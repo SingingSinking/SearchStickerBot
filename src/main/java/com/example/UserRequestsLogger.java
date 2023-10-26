@@ -47,7 +47,7 @@ public class UserRequestsLogger {
     }
 
     // Метод для записи запроса пользователя с указанием его имени (username) в лог-файл
-    public void logUserRequest(String username, String firstName, String lastName, String userLangCode, String request) {
+    public void logUserRequest(String username, String firstName, String lastName, String chatId, String userLangCode, String request) {
         Date now = new Date();
         String formattedDate = dateFormat.format(now);
     
@@ -65,6 +65,9 @@ public class UserRequestsLogger {
             bufferedWriter.newLine();
 
             bufferedWriter.write("Last name: " + lastName + "; ");
+            bufferedWriter.newLine();
+
+            bufferedWriter.write("Chat ID: " + chatId + "; ");
             bufferedWriter.newLine();
 
             bufferedWriter.write("Lang code: " + userLangCode);

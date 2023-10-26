@@ -41,13 +41,13 @@ public class CommandSearchStickers  implements Action {
         MapPack allPack = new MapPack(chpicSite, combotSite);
         
         String text;
-       if (allPack.SizePack() == 0){
-            text = "По вашему запросу не обнаружены стикеры :("
-            + "\nВозможно, вам стоит немного изменить текст сообщения или попробовать другой язык";
-       } else {
-            text =  allPack.getPackInfo(MessageLimit);
-       }
-        return new SendMessage(chatId, text);
+        if (allPack.SizePack() == 0){
+                text = "По вашему запросу не обнаружены стикеры 🤧"
+                + "\nВозможно, вам стоит немного изменить текст сообщения или попробовать другой язык";
+        } else {
+                text =  allPack.getPackInfo(MessageLimit);
+        }
+            return new SendMessage(chatId, text);
     }
 
 
