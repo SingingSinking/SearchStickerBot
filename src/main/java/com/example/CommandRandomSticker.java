@@ -21,6 +21,9 @@ public class CommandRandomSticker implements Action{
         //Если по первому слову не нашлось набора со стикерами
         if (allPack.SizePack() == 0){
 
+            //Удаляем первое слово потому что по нему не нашлось паков
+            randomWords.remove(0);
+            
             //Подставляем слова пока не найдется хотя бы один набор стикеров
             for (String word : randomWords) {
                 allPack = GetPackByWord(word);
@@ -52,9 +55,11 @@ public class CommandRandomSticker implements Action{
         if (kreeklySite.GetAllHtmlPage() != null){
             int countWords = kreeklySite.GetAllHtmlPage().getElementsByClass("dict-word").size();
             for (int i = 0; i<countWords; i++){
-                String word =
-                kreeklySite.GetAllHtmlPage().getElementsByClass("dict-word").get(i).child(2).text();
-                //System.out.println(word);
+
+                String word =kreeklySite.GetAllHtmlPage().
+                getElementsByClass("dict-word").
+                get(i).child(2).text();
+
                 words.add(word);
             }
         }
