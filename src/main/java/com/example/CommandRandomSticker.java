@@ -12,32 +12,22 @@ public class CommandRandomSticker implements Action{
         var msg = update.getMessage();
         var chatId = msg.getChatId().toString();
 
-        //Создаем массив из countWords рандомных слов
-        //При значении больше 200, начинают возникать сбои в работе 
+        //Создаем массив рандомных слов
         ArrayList<String> randomWords = GetRandomWord();
 
-        //Поиск пака по первому слову
-        Website combotSite = new Website("https://combot.org/telegram/stickers?q=" + randomWords.get(0), "combot");
-        Website chpicSite = new Website("https://chpic.su/ru/stickers/search/" + randomWords.get(0) + "/?searchModule=stickers", "chpic");
-        MapPack allPack = new MapPack(chpicSite, combotSite);
-
+        //Получаем паки по первому слову из randomWords
+        MapPack allPack = GetPackByWord(randomWords.get(0));
+        
         //Если по первому слову не нашлось набора со стикерами
         if (allPack.SizePack() == 0){
+
             //Подставляем слова пока не найдется хотя бы один набор стикеров
             for (String word : randomWords) {
-                combotSite = new Website("https://combot.org/telegram/stickers?q=" + word, "combot");
-                chpicSite = new Website("https://chpic.su/ru/stickers/search/" + word + "/?searchModule=stickers", "chpic");
-                allPack = new MapPack(chpicSite, combotSite);
-                System.out.println(allPack.GetNamePack(0));
+                allPack = GetPackByWord(word);
+                //Выход из цикла если нашелся хотя бы один пак
                 if (allPack.SizePack()!=0) break;
             }
-            //Если после подстановки countWords слов не нашлись паки, 
-            //выводим первый пак по запросу anime (Крайне редкий шанс что такое произойдет при большом countWords)
-            combotSite = new Website("https://combot.org/telegram/stickers?q=" + "anime", "combot");
-            chpicSite = new Website("https://chpic.su/ru/stickers/search/" + "anime" + "/?searchModule=stickers", "chpic");
-            allPack = new MapPack(chpicSite, combotSite);
         }
-        //System.out.println(allPack.SizePack());
         var out = new StringBuilder();
         out.append("Новый стикер-пак для вас 😋:").append("\n");
         out.append("Название: ").append(allPack.GetNamePack(0)).append("\n");
@@ -46,19 +36,25 @@ public class CommandRandomSticker implements Action{
 
         return new SendMessage(chatId, out.toString());
     }
+    //
+    private MapPack GetPackByWord(String randomWords) {
+        Website combotSite = new Website("https://combot.org/telegram/stickers?q=" + randomWords, "combot");
+        Website chpicSite = new Website("https://chpic.su/ru/stickers/search/" + randomWords + "/?searchModule=stickers", "chpic");
+        return new MapPack(chpicSite, combotSite);
+    }
 
     private ArrayList<String> GetRandomWord() {
         //Сайт с рандомными словами (каждый раз разные слова по одной и той же ссылке)
+        //kreeklySite всегда возвращает 20 слов
         Website kreeklySite = new Website("https://www.kreekly.com/random/noun/", "kreekly");
 
         ArrayList<String> words = new ArrayList<>();
         if (kreeklySite.GetAllHtmlPage() != null){
-            //System.out.println(sanstvSite.GetAllHtmlPage().getElementsByTag("li").size());
             int countWords = kreeklySite.GetAllHtmlPage().getElementsByClass("dict-word").size();
             for (int i = 0; i<countWords; i++){
                 String word =
                 kreeklySite.GetAllHtmlPage().getElementsByClass("dict-word").get(i).child(2).text();
-                System.out.println(word);
+                //System.out.println(word);
                 words.add(word);
             }
         }
