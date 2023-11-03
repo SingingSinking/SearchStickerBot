@@ -6,7 +6,7 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-public class CommandRandomSticker implements Action{
+public class CommandRandomEmoji implements Action{
     @Override
     public BotApiMethod handle(Update update) {
         var msg = update.getMessage();
@@ -14,21 +14,21 @@ public class CommandRandomSticker implements Action{
 
         //Создаем массив рандомных слов
         ArrayList<String> randomWords = GetRandomWord();
-
+        //Сайт упал
         if (randomWords == null) return new SendMessage(chatId, "Наблюдаются сбои в работе команды 🤧\nУже решаем проблему, ожидайте");
 
         //Получаем паки по первому слову из randomWords
         MapPack allPack = GetPackByWord(randomWords.get(0));
-
+        //Сайт упал
         if (allPack == null) return new SendMessage(chatId, "Наблюдаются сбои в работе команды 🤧\nУже решаем проблему, ожидайте");
-        
-        //Если по первому слову не нашлось набора со стикерами
+
+        //Если по первому слову не нашлось набора с эмоджи
         if (allPack.SizePack() == 0){
 
             //Удаляем первое слово потому что по нему не нашлось паков
             randomWords.remove(0);
             
-            //Подставляем слова пока не найдется хотя бы один набор стикеров
+            //Подставляем слова пока не найдется хотя бы один набор эмоджи
             for (String word : randomWords) {
                 allPack = GetPackByWord(word);
                 //Выход из цикла если нашелся хотя бы один пак
@@ -36,7 +36,7 @@ public class CommandRandomSticker implements Action{
             }
         }
         var out = new StringBuilder();
-        out.append("Новый стикер-пак для вас 😋:").append("\n");
+        out.append("Новые эмоджи для вас 😋:").append("\n");
         out.append("Название: ").append(allPack.GetNamePack(0)).append("\n");
         out.append("Ссылка на добавление: ").append(allPack.GetUrlPack(0)).append("\n");
 
@@ -45,11 +45,8 @@ public class CommandRandomSticker implements Action{
     }
     //
     private MapPack GetPackByWord(String randomWords) {
-        Website combotSite = new Website("https://combot.org/telegram/stickers?q=" + randomWords, "combotSticker");
-        Website chpicSite = new Website("https://chpic.su/ru/stickers/search/" + randomWords + "/?searchModule=stickers", "chpicSticker");
-        if (chpicSite.GetStatus() == false && combotSite.GetStatus() == false) 
-            return null;
-        return new MapPack(chpicSite, combotSite);
+        Website chpicSite = new Website("https://chpic.su/ru/stickers/search/" + randomWords + "/?searchModule=emojis", "chpicEmoji");
+        return new MapPack(chpicSite);
     }
 
     private ArrayList<String> GetRandomWord() {

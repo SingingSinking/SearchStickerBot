@@ -9,14 +9,17 @@ public class MapPack {
     // Constructor 1 
     public MapPack(Website site) {
         switch (site.GetNamePage()) {
-            case "combot":
-                CombotFillPack(site);
+            case "combotSticker":
+                CombotStickersFillPack(site);
                 break;
 
-            case "chpic":
-                ChpicFillPack(site);
+            case "chpicSticker":
+                ChpicStickersFillPack(site);
                 break;
 
+            case "chpicEmoji":
+                ChpicEmojiFillPack(site);
+                break;
             // Add site method here
             // case "siteName":
             //     MethodSite;
@@ -28,12 +31,14 @@ public class MapPack {
     }
     // Constructor 2 
     public MapPack(Website site1, Website site2) {
-        ChpicFillPack(site1);
-        CombotFillPack(site2);
+        ChpicStickersFillPack(site1);
+        CombotStickersFillPack(site2);
         // Add site method here
     }
 
-    private void CombotFillPack(Website htmlDom) {
+
+    //Парсеры для стикеров
+    private void CombotStickersFillPack(Website htmlDom) {
         if (htmlDom.GetAllHtmlPage() != null){
             int countPacks = (htmlDom.GetAllHtmlPage().getElementsByClass("sticker-pack__header").size()) / 2;
             for (int i = 0; i < countPacks; i++) {
@@ -54,7 +59,7 @@ public class MapPack {
         }
     }
 
-    private void ChpicFillPack(Website htmlDom) {
+    private void ChpicStickersFillPack(Website htmlDom) {
         if (htmlDom.GetAllHtmlPage() != null){
             int countPacks = htmlDom.GetAllHtmlPage().getElementsByClass("collectionid").size();
             for (int i = 0; i < countPacks; i++) {
@@ -84,6 +89,41 @@ public class MapPack {
         }
         
     }
+    
+    
+    //Парсеры для емоджи 
+    private void ChpicEmojiFillPack(Website htmlDom) {
+        if (htmlDom.GetAllHtmlPage() != null){
+            int countPacks = htmlDom.GetAllHtmlPage().getElementsByClass("emojis_list_item clickable_area").size();
+            //System.out.println("Кол-во емоджи: " + countPacks);
+
+            for (int i = 0; i < countPacks; i++) {
+
+                String urlPack =
+                    "tg://addstickers?set=" + htmlDom.GetAllHtmlPage().getElementsByClass("collectionid").get(i).child(0)
+                            .text();
+
+                String namePack = htmlDom.GetAllHtmlPage().getElementsByClass("collectionid").get(i).child(0)
+                            .text();
+
+                String urlImgPack = "https://chpic.su"
+                        + htmlDom.GetAllHtmlPage().getElementsByClass("images").get(i).select("img").attr("src");
+
+                if (urlImgPack.equals("https://chpic.su")) {
+                    // poster
+                    // urlImgPack +=
+                    // htmlDom.GetAllHtmlPage().getElementsByClass("images").get(i).select("video").attr("poster");
+                    // gif
+                    urlImgPack = "https://chpic.su"
+                            + htmlDom.GetAllHtmlPage().getElementsByClass("images").get(i).select("source").attr("src");
+                }
+
+                Pack pack = new Pack(namePack, urlPack, urlImgPack);
+
+                packs.add(pack);
+            }
+        }
+    }
     // Add new parse method here
     
     // public methods
@@ -106,7 +146,7 @@ public class MapPack {
         if (packs.size()< count) count = packs.size();
 
 
-        info.append("Было найдено ").append(count).append(" наборов со стикерами. \n").append("\n");
+        info.append("Было найдено ").append(count).append(" наборов. \n").append("\n");
         
         for (int i = 0; i < count; i++) {
             info.append("Название: ").append(packs.get(i).GetName()).append("\n");

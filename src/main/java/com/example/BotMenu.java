@@ -29,9 +29,12 @@ public class BotMenu extends TelegramLongPollingBot {
         //Кнопки меню
         List<BotCommand> listOfButtonsMenu = new ArrayList<>();
         listOfButtonsMenu.add(new BotCommand("/start", "Приветственное сообщение"));
-        listOfButtonsMenu.add(new BotCommand("/search", "Начать поиск стикер-пака"));
+        listOfButtonsMenu.add(new BotCommand("/searchsticker", "Начать поиск стикер-пака"));
         listOfButtonsMenu.add(new BotCommand("/randomsticker", "Случайный стикер-пак"));
+        listOfButtonsMenu.add(new BotCommand("/searchemoji", "Поиск эмоджи по слову"));
+        listOfButtonsMenu.add(new BotCommand("/randomemoji", "Случайный эмоджи"));
         listOfButtonsMenu.add(new BotCommand("/botinfo", "Информация о боте"));
+
         try {
             this.execute(new SetMyCommands(listOfButtonsMenu, new BotCommandScopeDefault(), null));
         } catch(TelegramApiException e){
@@ -56,7 +59,7 @@ public class BotMenu extends TelegramLongPollingBot {
                 var msg = actions.get(bindingBy.get(chatId)).callback(update);
                 bindingBy.remove(chatId);
                 send(msg);
-            }
+            } 
         }
     }
     //Метод записи пользователя в лог

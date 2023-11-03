@@ -10,13 +10,17 @@ public class Website {
     private String url;
     private String name;
     private Document htmlCode = null;
+    private Boolean status = true;
     
     //Constructor
     public Website(String url, String site){
         this.url = url;
         name = site;
         htmlCode = FillHtml(url);
-        if ( htmlCode == null) System.out.println("Не удалось получить информацию с сайта " + site + ". Возможно сайт упал");
+        if ( htmlCode == null){
+            System.out.println("Не удалось получить информацию с сайта " + site + ". Возможно сайт упал");
+            status = false;
+        } 
     }
     
     private Document FillHtml(String url){
@@ -56,4 +60,7 @@ public class Website {
         return htmlCode;
     }
 
+    public Boolean GetStatus(){
+        return status;
+    }
 }
