@@ -3,9 +3,13 @@ package com.example;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
@@ -26,7 +30,7 @@ public class BotMenu extends TelegramLongPollingBot {
         this.token = token;
         requestsLogger = new UserRequestsLogger(logFilePath);
 
-        //Кнопки меню
+        //Команды меню
         List<BotCommand> listOfButtonsMenu = new ArrayList<>();
         listOfButtonsMenu.add(new BotCommand("/start", "Приветственное сообщение"));
         listOfButtonsMenu.add(new BotCommand("/searchsticker", "Начать поиск стикер-пака"));
@@ -46,21 +50,59 @@ public class BotMenu extends TelegramLongPollingBot {
 
     public void onUpdateReceived(Update update) {
         if (update.hasMessage()) {
-            
-            AddUserInfoToLog(update);
             String key = update.getMessage().getText();
             String chatId = update.getMessage().getChatId().toString();
 
+            //Забираем данные о пользователе
+            AddUserInfoToLog(update);
+
+            //Для всех команд используем стандартное меню
+            //В зависимости от команды, нужно в соответствующем классе изменить ReplyKeyboardMarkup
+            ReplyKeyboardMarkup MainMenuKeyboard = GetMainMenuKeyboard();
+
             if (actions.containsKey(key)) {
-                BotApiMethod msg = actions.get(key).handle(update);
+                SendMessage msg = actions.get(key).handle(update);
+
+                msg.setReplyMarkup(MainMenuKeyboard);
+
                 bindingBy.put(chatId, key);
                 send(msg);
             } else if (bindingBy.containsKey(chatId)) {
-                var msg = actions.get(bindingBy.get(chatId)).callback(update);
+                SendMessage msg = actions.get(bindingBy.get(chatId)).callback(update);
+
+                msg.setReplyMarkup(MainMenuKeyboard);
+                
                 bindingBy.remove(chatId);
                 send(msg);
             } 
         }
+    }
+
+    private ReplyKeyboardMarkup GetMainMenuKeyboard() {
+        
+        final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setSelective(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(false);
+
+        List<KeyboardRow> keyboard = new ArrayList<>();
+
+        KeyboardRow row1 = new KeyboardRow();
+        KeyboardRow row2 = new KeyboardRow();
+        KeyboardRow row3 = new KeyboardRow();
+
+        row1.add(new KeyboardButton("Поиск стикеров"));
+        row1.add(new KeyboardButton("Случайный стикер"));
+        row2.add(new KeyboardButton("Поиск эмоджи"));
+        row2.add(new KeyboardButton("Случайный эмоджи"));
+        row3.add(new KeyboardButton("Информация о боте"));
+
+        keyboard.add(row1);
+        keyboard.add(row2);
+        keyboard.add(row3);
+
+        replyKeyboardMarkup.setKeyboard(keyboard);
+        return replyKeyboardMarkup;
     }
     //Метод записи пользователя в лог
     private void AddUserInfoToLog(Update update) {

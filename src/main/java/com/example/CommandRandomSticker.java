@@ -2,13 +2,12 @@ package com.example;
 
 import java.util.ArrayList;
 
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 public class CommandRandomSticker implements Action{
     @Override
-    public BotApiMethod handle(Update update) {
+    public SendMessage handle(Update update) {
         var msg = update.getMessage();
         var chatId = msg.getChatId().toString();
 
@@ -40,8 +39,11 @@ public class CommandRandomSticker implements Action{
         out.append("Название: ").append(allPack.GetNamePack(0)).append("\n");
         out.append("Ссылка на добавление: ").append(allPack.GetUrlPack(0)).append("\n");
 
-
-        return new SendMessage(chatId, out.toString());
+        final SendMessage sendMessage = new SendMessage();
+        sendMessage.enableMarkdown(true);
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(out.toString());
+        return sendMessage;
     }
     //
     private MapPack GetPackByWord(String randomWords) {
@@ -74,7 +76,7 @@ public class CommandRandomSticker implements Action{
     }
 
     @Override
-    public BotApiMethod callback(Update update) {
+    public SendMessage callback(Update update) {
         return handle(update);
     }
 }

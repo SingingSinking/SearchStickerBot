@@ -1,6 +1,5 @@
 package com.example;
 
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -14,16 +13,21 @@ public class CommandSearchEmoji implements Action{
     }
 
     @Override
-    public BotApiMethod handle(Update update) {
+    public SendMessage handle(Update update) {
         var msg = update.getMessage();
         var chatId = msg.getChatId().toString();
         var text = "Введите название емоджи";
-        return new SendMessage(chatId, text);
+
+        final SendMessage sendMessage = new SendMessage();
+        sendMessage.enableMarkdown(true);
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(text);
+        return sendMessage;
     }
 
     //Метод для емоджи паков пользователю
     @Override
-    public BotApiMethod callback(Update update) {
+    public SendMessage callback(Update update) {
         var msg = update.getMessage();
         var chatId = msg.getChatId().toString();
         namePack = msg.getText();
@@ -46,6 +50,11 @@ public class CommandSearchEmoji implements Action{
         } else {
                 text =  allPack.getPackInfo(MessageLimit);
         }
-            return new SendMessage(chatId, text);
+
+        final SendMessage sendMessage = new SendMessage();
+        sendMessage.enableMarkdown(true);
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(text);
+        return sendMessage;
     }
 }
