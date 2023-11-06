@@ -4,6 +4,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
@@ -48,36 +49,51 @@ public class BotMenu extends TelegramLongPollingBot {
     }
 
 
-    public void onUpdateReceived(Update update) {
-        if (update.hasMessage()) {
-            String key = update.getMessage().getText();
-            String chatId = update.getMessage().getChatId().toString();
+    String commandForCallBack = "/start";
+    int counterPage;
 
+    public void onUpdateReceived(Update update) {
+        //Если отправленно сообщение
+        if (update.hasMessage()) {
+            String command = update.getMessage().getText();
+            String chatId = update.getMessage().getChatId().toString();
             //Забираем данные о пользователе
             AddUserInfoToLog(update);
-
+            counterPage = 1;
             //Для всех команд используем стандартное меню
             //В зависимости от команды, нужно в соответствующем классе изменить ReplyKeyboardMarkup
             ReplyKeyboardMarkup MainMenuKeyboard = GetMainMenuKeyboard();
 
-            if (actions.containsKey(key)) {
-                SendMessage msg = actions.get(key).handle(update);
-
+            if (actions.containsKey(command)) {
+                SendMessage msg = actions.get(command).handle(update);
                 msg.setReplyMarkup(MainMenuKeyboard);
-
-                bindingBy.put(chatId, key);
+                commandForCallBack = command;
+                bindingBy.put(chatId, command);
                 send(msg);
             } else if (bindingBy.containsKey(chatId)) {
                 SendMessage msg = actions.get(bindingBy.get(chatId)).callback(update);
 
-                msg.setReplyMarkup(MainMenuKeyboard);
-                
                 bindingBy.remove(chatId);
                 send(msg);
             } 
+        } else if (update.hasCallbackQuery()){ //Если нажата кнопка
+            if (update.getCallbackQuery().getData().equals("backButton")) counterPage--;
+            if (update.getCallbackQuery().getData().equals("nextButton")) counterPage++;
+
+            System.out.println("Command: " + commandForCallBack);
+            MapPack pack = actions.get(commandForCallBack).getPack();
+            System.out.println("Размер пака: " + pack.SizePack());
+
+            System.out.println("counterPage до класса: " + counterPage);
+            AllButonReaction reaction = new AllButonReaction(update, pack, counterPage);
+            System.out.println("counterPage после класса: " + counterPage);
+
+            EditMessageText msg = reaction.GetNewMessage();
+            send(msg);
         }
     }
 
+    //Кнопки главного меню
     private ReplyKeyboardMarkup GetMainMenuKeyboard() {
         
         final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
@@ -114,10 +130,11 @@ public class BotMenu extends TelegramLongPollingBot {
         String chatId = update.getMessage().getChatId().toString();
         requestsLogger.logUserRequest(username, firstName, lastName, chatId, userLangCode, userRequest); // Запись пользователя в лог
     }
-
-    private void send(BotApiMethod msg) {
+    //Метод отправкии в бота
+    private void send(BotApiMethod mess) {
         try {
-            execute(msg);
+            System.out.println(mess);
+            execute(mess);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

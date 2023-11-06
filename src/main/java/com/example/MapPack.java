@@ -1,6 +1,8 @@
 package com.example;
 import java.util.ArrayList;
 
+import org.telegram.telegrambots.meta.api.objects.MessageEntity;
+
 
 public class MapPack {
     // Contains links to stickers
@@ -46,7 +48,6 @@ public class MapPack {
                 String urlPack =
                     htmlDom.GetAllHtmlPage().getElementsByClass("sticker-pack sticker-packs-list__item").get(i).child(0)
                             .select("a").attr("href");
-
                 String namePack = urlPack.substring(urlPack.lastIndexOf('/') + 1);
 
                 String urlImgPack = htmlDom.GetAllHtmlPage().getElementsByClass("sticker-pack__header").get(i).child(0)
@@ -67,7 +68,6 @@ public class MapPack {
                 String urlPack =
                     "https://t.me/addstickers/" + htmlDom.GetAllHtmlPage().getElementsByClass("collectionid").get(i).child(0)
                             .text();
-
                 String namePack = urlPack.substring(urlPack.lastIndexOf('/') + 1);
 
                 String urlImgPack = "https://chpic.su"
@@ -139,23 +139,33 @@ public class MapPack {
         return packs.get(index).GetImg();
     }
 
-    public String getPackInfo(int count) {
+    public String getPackInfo(int startCount, int endCount) {
         StringBuilder info = new StringBuilder();
         
-        //Если нужно вывести 20 элементов, а в наборе нашлось меньше чем 20
-        if (packs.size()< count) count = packs.size();
+        if (endCount > packs.size()) endCount = packs.size();
 
+        info.append("Было найдено ").append(packs.size()).append(" наборов\n").append("\n");
 
-        info.append("Было найдено ").append(count).append(" наборов. \n").append("\n");
-        
-        for (int i = 0; i < count; i++) {
-            info.append("Название: ").append(packs.get(i).GetName()).append("\n");
-            info.append("Ссылка на добавление: ").append(packs.get(i).GetUrl()).append("\n");
+        for (int i = startCount; i < endCount; i++) {
+            String stickerUrl = packs.get(i).GetUrl();
+            String stickerName = packs.get(i).GetName();
+
+            //Экранируем все спец. символы, иначе телеграм не будет их учитывать и ссылка потеряет часть символов
+            stickerUrl = ShieldStr(stickerUrl);
+            stickerName = ShieldStr(stickerName);
+
+            
+            info.append("👉Название: ").append(stickerName).append("\n");
+            info.append("   [\\[Открыть\\]]").append("(" + stickerUrl + ")").append("\n");
             info.append("\n");
             // info.append("URL image: ").append(pack.GetImg()).append("\n\n");
         }
-    
+        System.out.println(info.toString());
         return info.toString();
+    }
+    //метод экранирует строку
+    private String ShieldStr(String str){
+        return str.replaceAll("\\(", "%28").replaceAll("\\)", "%29").replaceAll("_", "%5f").replace(".", "\\.");
     }
 
     public void PrintPackInfo() {
@@ -165,6 +175,7 @@ public class MapPack {
                     + "URL image: " + pack.GetImg() + "\n");
         }
     }
+
     public int SizePack() {
         return packs.size();
     }

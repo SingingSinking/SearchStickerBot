@@ -25,4 +25,9 @@ public class CommandBotInfo implements Action {
     public SendMessage callback(Update update) {
         return handle(update);
     }
+
+    @Override
+    public MapPack getPack() {
+        return null;
+    }
 }

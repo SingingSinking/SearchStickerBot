@@ -1,9 +1,7 @@
 package com.example;
 
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 
 public class CommandStart implements Action {
@@ -29,5 +27,11 @@ public class CommandStart implements Action {
     @Override
     public SendMessage callback(Update update) {
         return handle(update);
+    }
+
+    @Override
+    public MapPack getPack() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

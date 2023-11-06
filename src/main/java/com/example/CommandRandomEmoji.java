@@ -6,6 +6,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 public class CommandRandomEmoji implements Action{
+    private MapPack allPack;
+    
     @Override
     public SendMessage handle(Update update) {
         var msg = update.getMessage();
@@ -17,7 +19,7 @@ public class CommandRandomEmoji implements Action{
         if (randomWords == null) return new SendMessage(chatId, "Наблюдаются сбои в работе команды 🤧\nУже решаем проблему, ожидайте");
 
         //Получаем паки по первому слову из randomWords
-        MapPack allPack = GetPackByWord(randomWords.get(0));
+        allPack = GetPackByWord(randomWords.get(0));
         //Сайт упал
         if (allPack == null) return new SendMessage(chatId, "Наблюдаются сбои в работе команды 🤧\nУже решаем проблему, ожидайте");
 
@@ -34,18 +36,34 @@ public class CommandRandomEmoji implements Action{
                 if (allPack.SizePack()!=0) break;
             }
         }
-        var out = new StringBuilder();
-        out.append("Новые эмоджи для вас 😋:").append("\n");
-        out.append("Название: ").append(allPack.GetNamePack(0)).append("\n");
-        out.append("Ссылка на добавление: ").append(allPack.GetUrlPack(0)).append("\n");
+        StringBuilder info = new StringBuilder();
+        String stickerUrl = allPack.GetUrlPack(0);
+        String stickerName =allPack.GetNamePack(0);
 
+        //Экранируем все спец. символы, иначе телеграм не будет их учитывать и ссылка потеряет часть символов
+        stickerUrl = ShieldStr(stickerUrl);
+        stickerName = ShieldStr(stickerName);
+
+        info.append("Новые эмоджи для вас 😋:").append("\n");
+        info.append("👉Название: ").append(stickerName).append("\n");
+        info.append("   [\\[Открыть\\]]").append("(" + stickerUrl + ")").append("\n");
+        info.append("\n");
+        // info.append("URL image: ").append(pack.GetImg()).append("\n\n");
+        
         final SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
         sendMessage.setChatId(chatId);
-        sendMessage.setText(out.toString());
+        sendMessage.setParseMode("MarkdownV2");
+        sendMessage.setText(info.toString());
         return sendMessage;
     }
-    //
+    
+    //метод экранирует строку
+    private String ShieldStr(String str){
+        return str.replaceAll("\\(", "%28").replaceAll("\\)", "%29").replaceAll("_", "%5f").replace(".", "\\.");
+    }
+
+
     private MapPack GetPackByWord(String randomWords) {
         Website chpicSite = new Website("https://chpic.su/ru/stickers/search/" + randomWords + "/?searchModule=emojis", "chpicEmoji");
         return new MapPack(chpicSite);
@@ -75,5 +93,10 @@ public class CommandRandomEmoji implements Action{
     @Override
     public SendMessage callback(Update update) {
         return handle(update);
+    }
+    @Override
+    public MapPack getPack() {
+        // TODO Auto-generated method stub
+        return allPack;
     }
 }
