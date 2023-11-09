@@ -3,9 +3,14 @@ package com.example;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
@@ -26,11 +31,15 @@ public class BotMenu extends TelegramLongPollingBot {
         this.token = token;
         requestsLogger = new UserRequestsLogger(logFilePath);
 
-        //Кнопки меню
+        //Команды меню
         List<BotCommand> listOfButtonsMenu = new ArrayList<>();
         listOfButtonsMenu.add(new BotCommand("/start", "Приветственное сообщение"));
-        listOfButtonsMenu.add(new BotCommand("/search", "Начать поиск стикер-пака"));
+        listOfButtonsMenu.add(new BotCommand("/searchsticker", "Начать поиск стикер-пака"));
+        listOfButtonsMenu.add(new BotCommand("/randomsticker", "Случайный стикер-пак"));
+        listOfButtonsMenu.add(new BotCommand("/searchemoji", "Поиск эмоджи по слову"));
+        listOfButtonsMenu.add(new BotCommand("/randomemoji", "Случайный эмоджи"));
         listOfButtonsMenu.add(new BotCommand("/botinfo", "Информация о боте"));
+
         try {
             this.execute(new SetMyCommands(listOfButtonsMenu, new BotCommandScopeDefault(), null));
         } catch(TelegramApiException e){
@@ -40,23 +49,75 @@ public class BotMenu extends TelegramLongPollingBot {
     }
 
 
+    String commandForCallBack = "/start";
+    int counterPage;
+
     public void onUpdateReceived(Update update) {
+        //Если отправленно сообщение
         if (update.hasMessage()) {
-
-            AddUserInfoToLog(update);
-            String key = update.getMessage().getText();
+            String command = update.getMessage().getText();
             String chatId = update.getMessage().getChatId().toString();
+            //Забираем данные о пользователе
+            AddUserInfoToLog(update);
+            counterPage = 1;
+            //Для всех команд используем стандартное меню
+            //В зависимости от команды, нужно в соответствующем классе изменить ReplyKeyboardMarkup
+            ReplyKeyboardMarkup MainMenuKeyboard = GetMainMenuKeyboard();
 
-            if (actions.containsKey(key)) {
-                BotApiMethod msg = actions.get(key).handle(update);
-                bindingBy.put(chatId, key);
+            if (actions.containsKey(command)) {
+                SendMessage msg = actions.get(command).handle(update);
+                msg.setReplyMarkup(MainMenuKeyboard);
+                commandForCallBack = command;
+                bindingBy.put(chatId, command);
                 send(msg);
             } else if (bindingBy.containsKey(chatId)) {
-                var msg = actions.get(bindingBy.get(chatId)).callback(update);
+                SendMessage msg = actions.get(bindingBy.get(chatId)).callback(update);
+
                 bindingBy.remove(chatId);
                 send(msg);
-            }
+            } 
+        } else if (update.hasCallbackQuery()){ //Если нажата кнопка
+            
+            if (update.getCallbackQuery().getData().equals("backButton")) counterPage--;
+            if (update.getCallbackQuery().getData().equals("nextButton")) counterPage++;
+
+            // System.out.println("Command: " + commandForCallBack);
+            MapPack pack = actions.get(commandForCallBack).getPack();
+            // System.out.println("Размер пака: " + pack.SizePack());
+
+            AllButonReaction reaction = new AllButonReaction(update, pack, counterPage);
+
+            EditMessageText msg = reaction.GetNewMessage();
+            send(msg);
         }
+    }
+
+    //Кнопки главного меню
+    private ReplyKeyboardMarkup GetMainMenuKeyboard() {
+        
+        final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setSelective(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(false);
+
+        List<KeyboardRow> keyboard = new ArrayList<>();
+
+        KeyboardRow row1 = new KeyboardRow();
+        KeyboardRow row2 = new KeyboardRow();
+        KeyboardRow row3 = new KeyboardRow();
+
+        row1.add(new KeyboardButton("Поиск стикеров"));
+        row1.add(new KeyboardButton("Случайный стикер"));
+        row2.add(new KeyboardButton("Поиск эмоджи"));
+        row2.add(new KeyboardButton("Случайный эмоджи"));
+        row3.add(new KeyboardButton("Информация о боте"));
+
+        keyboard.add(row1);
+        keyboard.add(row2);
+        keyboard.add(row3);
+
+        replyKeyboardMarkup.setKeyboard(keyboard);
+        return replyKeyboardMarkup;
     }
     //Метод записи пользователя в лог
     private void AddUserInfoToLog(Update update) {
@@ -65,12 +126,14 @@ public class BotMenu extends TelegramLongPollingBot {
         String lastName = update.getMessage().getFrom().getLastName();
         String userLangCode =  update.getMessage().getFrom().getLanguageCode();
         String userRequest =  update.getMessage().getText();
-        requestsLogger.logUserRequest(username, firstName, lastName, userLangCode, userRequest); // Запись пользователя в лог
+        String chatId = update.getMessage().getChatId().toString();
+        requestsLogger.logUserRequest(username, firstName, lastName, chatId, userLangCode, userRequest); // Запись пользователя в лог
     }
-
-    private void send(BotApiMethod msg) {
+    //Метод отправкии в бота
+    private void send(BotApiMethod mess) {
         try {
-            execute(msg);
+            //System.out.println(mess);
+            execute(mess);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-public class CommandSearchStickers implements Action {
+public class CommandSearchEmoji implements Action{
     private final String action;
     private String namePack;
     private MapPack allPack;
@@ -22,7 +22,7 @@ public class CommandSearchStickers implements Action {
     private int countPage;
 
 
-    public CommandSearchStickers(String action) {
+    public CommandSearchEmoji(String action) {
         this.action = action;
     }
 
@@ -30,7 +30,7 @@ public class CommandSearchStickers implements Action {
     public SendMessage handle(Update update) {
         var msg = update.getMessage();
         var chatId = msg.getChatId().toString();
-        var text = "Введите название стикеров";
+        var text = "Введите название эмоджи";
 
         final SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
@@ -39,43 +39,30 @@ public class CommandSearchStickers implements Action {
         return sendMessage;
     }
 
-    //Метод для отправки паков пользователю
+    //Метод для емоджи паков пользователю
     @Override
     public SendMessage callback(Update update) {
         var msg = update.getMessage();
         var chatId = msg.getChatId().toString();
         namePack = msg.getText();
 
-
-        Website combotSite = new Website("https://combot.org/telegram/stickers?q=" + namePack, "combotSticker");
-        Website chpicSite = new Website("https://chpic.su/ru/stickers/search/" + namePack + "/?searchModule=stickers", "chpicSticker");
-        
+        //Сайт с Emoji (аргумент метода - chpicEmoji, по нему MapPack понимает что с сайта берутся емоджи)
+        Website chpicSite = new Website("https://chpic.su/ru/stickers/search/" + namePack + "/?searchModule=emojis", "chpicEmoji");
         //Сайт упал
-        if (chpicSite.GetStatus() == false && combotSite.GetStatus() == false) 
+        if (chpicSite.GetStatus() == false) 
             return new SendMessage(chatId, "Наблюдаются сбои в работе команды 🤧\nУже решаем проблему, ожидайте");
-            
-            // Создаем паки по отдельности
-        // MapPack combotPack = new MapPack(combotSite);
-        // MapPack chpicPack = new MapPack(chpicSite);
         
-            // Создаем общий пак который содержит все стикеры из двух сайтов.
-            // Общий пак содержит сначала стикеры из первого, а потом из второго сайта
-        allPack = new MapPack(chpicSite, combotSite);
+            // Создаем общий пак который содержит все емоджи
+        allPack = new MapPack(chpicSite);
         
         sizeAllPack = allPack.SizePack();
-        
+
         countPage = (int) Math.ceil(sizeAllPack/countPacksOnPage);
         if (sizeAllPack < countPacksOnPage) countPage = 1;
         //Создаем кнопки для перелистывания меню
         InlineKeyboardMarkup keyboard = SetBeginKeyboard();
 
 
-        // System.out.println("Количество в одном сообщении: " + COUNTPACKONMESSAGE + "\n" +
-        //                     "Количество всех паков: " + COUNTALLPACK + "\n" +
-        //                     "Количество страниц: " + COUNTPAGES + "\n" +
-        //                     "Количество паков на последнй странице: " + COUNTPACKONLASTMESSAGE + "\n");
-
-        
         final SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
         sendMessage.setChatId(chatId);
@@ -83,8 +70,8 @@ public class CommandSearchStickers implements Action {
         String text;
         if (sizeAllPack == 0){
             text = "К сожалению, по вашему запросу ничего не найдено\\. 🤧\n\n" + 
-                    "Почему стикеры могут не находиться?\n\n" +
-                    "1\\. Убедитесь, что вы ввели правильное название набора со стикерами\\.\n\n" +
+                    "Почему эмоджи могут не находиться?\n\n" +
+                    "1\\. Убедитесь, что вы ввели правильное название набора с эмоджи\\.\n\n" +
                     "2\\. Если вы уверены в правильности названия, попробуйте использовать другой язык для поиска\\.";
             sendMessage.setReplyMarkup(null);
         } else 
@@ -95,10 +82,6 @@ public class CommandSearchStickers implements Action {
         //System.out.println(sendMessage);
         return sendMessage;
     }
-
-    public MapPack getStickersMapPack(){
-        return allPack;
-    } 
 
     //Клавиатура с кнопками "Страница", "Дальше"
     private InlineKeyboardMarkup SetBeginKeyboard() {
