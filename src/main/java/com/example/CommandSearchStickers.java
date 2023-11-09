@@ -15,7 +15,7 @@ public class CommandSearchStickers implements Action {
 
     //Сколько еможди выводится на одной странице, следует учитывать что при нажатии кнопки, переменная в AllButtonReation
     //Может быть другой, тогда на страницах будет выводиться разное количесво паков
-    private int countPacksOnPage = 4;
+    private int countPacksOnPage = 5;
     //Количество паков в массиве
     private int sizeAllPack;
     //Всего страниц
@@ -30,7 +30,7 @@ public class CommandSearchStickers implements Action {
     public SendMessage handle(Update update) {
         var msg = update.getMessage();
         var chatId = msg.getChatId().toString();
-        var text = "Введите название 👇";
+        var text = "Введите название стикеров";
 
         final SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
@@ -82,12 +82,14 @@ public class CommandSearchStickers implements Action {
         sendMessage.setReplyMarkup(keyboard);
         String text;
         if (sizeAllPack == 0){
-                text = "По вашему запросу не обнаружены стикеры 🤧"
-                + "\nВозможно, вам стоит немного изменить текст сообщения или попробовать другой язык";
-                sendMessage.setReplyMarkup(null);
-        } else {
-                text =  allPack.getPackInfo(0, countPacksOnPage);
-        }
+            text = "К сожалению, по вашему запросу ничего не найдено\\. 🤧\n\n" + 
+                    "Почему стикеры могут не находиться?\n\n" +
+                    "1\\. Убедитесь, что вы ввели правильное название набора со стикерами\\.\n\n" +
+                    "2\\. Если вы уверены в правильности названия, попробуйте использовать другой язык для поиска\\.";
+            sendMessage.setReplyMarkup(null);
+        } else 
+            text =  allPack.getPackInfo(0, countPacksOnPage);
+
         sendMessage.setText(text);
         sendMessage.setParseMode("MarkdownV2");
         //System.out.println(sendMessage);

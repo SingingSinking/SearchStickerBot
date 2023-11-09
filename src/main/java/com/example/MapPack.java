@@ -144,23 +144,26 @@ public class MapPack {
         
         if (endCount > packs.size()) endCount = packs.size();
 
-        info.append("Было найдено ").append(packs.size()).append(" наборов\n").append("\n");
+        info.append("🌏Количество наборов: ").append(packs.size()).append("\n").append("\n");
 
         for (int i = startCount; i < endCount; i++) {
             String stickerUrl = packs.get(i).GetUrl();
             String stickerName = packs.get(i).GetName();
+
+            //Обрезаем строку с названием пака для красоты вывода в боте
+            int limitIndex = 15;
+            if (stickerName.length() > limitIndex) stickerName = stickerName.substring(0,limitIndex);
 
             //Экранируем все спец. символы, иначе телеграм не будет их учитывать и ссылка потеряет часть символов
             stickerUrl = ShieldStr(stickerUrl);
             stickerName = ShieldStr(stickerName);
 
             
-            info.append("👉Название: ").append(stickerName).append("\n");
-            info.append("   [\\[Открыть\\]]").append("(" + stickerUrl + ")").append("\n");
+            info.append("🔸Название: ").append(stickerName).append("\n");
+            info.append("🔸[\\[Открыть\\]]").append("(" + stickerUrl + ")").append("\n");
             info.append("\n");
-            // info.append("URL image: ").append(pack.GetImg()).append("\n\n");
         }
-        System.out.println(info.toString());
+        //System.out.println(info.toString());
         return info.toString();
     }
     //метод экранирует строку

@@ -77,16 +77,15 @@ public class BotMenu extends TelegramLongPollingBot {
                 send(msg);
             } 
         } else if (update.hasCallbackQuery()){ //Если нажата кнопка
+            
             if (update.getCallbackQuery().getData().equals("backButton")) counterPage--;
             if (update.getCallbackQuery().getData().equals("nextButton")) counterPage++;
 
-            System.out.println("Command: " + commandForCallBack);
+            // System.out.println("Command: " + commandForCallBack);
             MapPack pack = actions.get(commandForCallBack).getPack();
-            System.out.println("Размер пака: " + pack.SizePack());
+            // System.out.println("Размер пака: " + pack.SizePack());
 
-            System.out.println("counterPage до класса: " + counterPage);
             AllButonReaction reaction = new AllButonReaction(update, pack, counterPage);
-            System.out.println("counterPage после класса: " + counterPage);
 
             EditMessageText msg = reaction.GetNewMessage();
             send(msg);
@@ -133,7 +132,7 @@ public class BotMenu extends TelegramLongPollingBot {
     //Метод отправкии в бота
     private void send(BotApiMethod mess) {
         try {
-            System.out.println(mess);
+            //System.out.println(mess);
             execute(mess);
         } catch (TelegramApiException e) {
             e.printStackTrace();

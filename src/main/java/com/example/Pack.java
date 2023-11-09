@@ -11,8 +11,6 @@ public class Pack {
         this.urlImg = urlImg;
     }
 
-
-
     public String GetName(){
         return name;
     }

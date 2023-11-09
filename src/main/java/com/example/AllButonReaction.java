@@ -3,7 +3,6 @@ package com.example;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -17,7 +16,7 @@ public class AllButonReaction {
     //Счетчик страницы
     private int counterPage;
     //Количество паков на странице
-    private int countPacksOnPage = 4;
+    private int countPacksOnPage = 5;
     //Количество паков в массиве
     private int sizeAllPack;
     //Всего страниц
@@ -42,13 +41,13 @@ public class AllButonReaction {
 
         //Если нажата кнопка дальше
         if (callBackData.equals("nextButton")){
-            System.out.println("counterPage в классе после добавления: " + counterPage);
+            //System.out.println("counterPage в классе: " + counterPage);
             //Вычисляем какие паки нужно выводить в зависимости от счетчика страницы
             int startElement = (counterPage * countPacksOnPage) - countPacksOnPage;
             int endElement = counterPage * countPacksOnPage;
 
-            System.out.println("startElement: " + startElement + "\n" +
-                            "endElement: " + endElement + "\n");
+            // System.out.println("startElement: " + startElement + "\n" +
+            //                 "endElement: " + endElement + "\n");
             //Устанавливаем клавиатуру
             InlineKeyboardMarkup newKeyboard = SetKeyboard();
 
@@ -63,13 +62,13 @@ public class AllButonReaction {
             return msg;
 
         } else if (callBackData.equals("backButton")){ //Если нажата кнопка назад
-            System.out.println("counterPage в классе после уменьшения: " + counterPage);
+            //System.out.println("counterPage в классе после уменьшения: " + counterPage);
             //Вычисляем какие паки нужно выводить в зависимости от счетчика страницы
             int startElement = (counterPage * countPacksOnPage) - countPacksOnPage;
             int endElement = counterPage * countPacksOnPage;
 
-            System.out.println("startElement: " + startElement + "\n" +
-                            "endElement: " + endElement + "\n");
+            // System.out.println("startElement: " + startElement + "\n" +
+            //                 "endElement: " + endElement + "\n");
             //Устанавливаем клавиатуру
             InlineKeyboardMarkup newKeyboard = SetKeyboard();
             
