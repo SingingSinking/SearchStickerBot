@@ -65,16 +65,38 @@ public class BotMenu extends TelegramLongPollingBot {
             ReplyKeyboardMarkup MainMenuKeyboard = GetMainMenuKeyboard();
 
             if (actions.containsKey(command)) {
-                SendMessage msg = actions.get(command).handle(update);
-                msg.setReplyMarkup(MainMenuKeyboard);
-                commandForCallBack = command;
-                bindingBy.put(chatId, command);
-                send(msg);
-            } else if (bindingBy.containsKey(chatId)) {
-                SendMessage msg = actions.get(bindingBy.get(chatId)).callback(update);
 
-                bindingBy.remove(chatId);
-                send(msg);
+                final Thread commandThread = new Thread(){
+
+                    @Override
+                    public void run(){
+                        SendMessage msg = actions.get(command).handle(update);
+                        msg.setReplyMarkup(MainMenuKeyboard);
+                        commandForCallBack = command;
+                        bindingBy.put(chatId, command);
+                        send(msg);
+                    }
+
+                };
+
+                commandThread.start();
+                
+            } else if (bindingBy.containsKey(chatId)) {
+                final Thread removeChatIThread = new Thread(){
+
+                    @Override
+                    public void run(){
+                        
+                        SendMessage msg = actions.get(bindingBy.get(chatId)).callback(update);
+                        bindingBy.remove(chatId);
+                        send(msg);
+
+                    }
+
+                };
+
+                removeChatIThread.start();
+
             } 
         } else if (update.hasCallbackQuery()){ //Если нажата кнопка
             
