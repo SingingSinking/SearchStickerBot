@@ -46,8 +46,8 @@ public class CommandSearchEmoji implements Action{
         var chatId = msg.getChatId().toString();
         namePack = msg.getText();
 
-        //Сайт с Emoji (аргумент метода - chpicEmoji, по нему MapPack понимает что с сайта берутся емоджи)
-        Website chpicSite = new Website("https://chpic.su/ru/stickers/search/" + namePack + "/?searchModule=emojis", "chpicEmoji");
+        //Сайт с Emoji (аргумент метода - chpicEmojiSearch, по нему MapPack понимает что с сайта берутся емоджи)
+        Website chpicSite = new Website("https://chpic.su/ru/stickers/search/" + namePack + "/?searchModule=emojis", "chpicEmojiSearch");
         //Сайт упал
         if (chpicSite.GetStatus() == false) 
             return new SendMessage(chatId, "Наблюдаются сбои в работе команды 🤧\nУже решаем проблему, ожидайте");

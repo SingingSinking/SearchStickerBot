@@ -80,6 +80,7 @@ public class BotMenu extends TelegramLongPollingBot {
                 };
 
                 commandThread.start();
+                commandThread.isInterrupted();
                 
             } else if (bindingBy.containsKey(chatId)) {
                 final Thread removeChatIThread = new Thread(){
@@ -96,6 +97,7 @@ public class BotMenu extends TelegramLongPollingBot {
                 };
 
                 removeChatIThread.start();
+                removeChatIThread.isInterrupted();
 
             } 
         } else if (update.hasCallbackQuery()){ //Если нажата кнопка

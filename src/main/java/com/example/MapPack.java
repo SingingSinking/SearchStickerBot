@@ -1,9 +1,6 @@
 package com.example;
 import java.util.ArrayList;
 
-import org.telegram.telegrambots.meta.api.objects.MessageEntity;
-
-
 public class MapPack {
     // Contains links to stickers
     private ArrayList<Pack> packs = new ArrayList<Pack>();
@@ -19,9 +16,10 @@ public class MapPack {
                 ChpicStickersFillPack(site);
                 break;
 
-            case "chpicEmoji":
+            case "chpicEmojiSearch":
                 ChpicEmojiFillPack(site);
                 break;
+            
             // Add site method here
             // case "siteName":
             //     MethodSite;
@@ -31,6 +29,7 @@ public class MapPack {
                 break;
         }
     }
+
     // Constructor 2 
     public MapPack(Website site1, Website site2) {
         ChpicStickersFillPack(site1);
@@ -39,7 +38,7 @@ public class MapPack {
     }
 
 
-    //Парсеры для стикеров
+    //Парсеры для поиска стикеров
     private void CombotStickersFillPack(Website htmlDom) {
         if (htmlDom.GetAllHtmlPage() != null){
             int countPacks = (htmlDom.GetAllHtmlPage().getElementsByClass("sticker-pack__header").size()) / 2;
@@ -91,10 +90,10 @@ public class MapPack {
     }
     
     
-    //Парсеры для емоджи 
+    //Парсеры для поиска емоджи 
     private void ChpicEmojiFillPack(Website htmlDom) {
         if (htmlDom.GetAllHtmlPage() != null){
-            int countPacks = htmlDom.GetAllHtmlPage().getElementsByClass("emojis_list_item clickable_area").size();
+            int countPacks = htmlDom.GetAllHtmlPage().getElementsByClass("emojis_list_item").size();
             //System.out.println("Кол-во емоджи: " + countPacks);
 
             for (int i = 0; i < countPacks; i++) {
@@ -124,7 +123,6 @@ public class MapPack {
             }
         }
     }
-    // Add new parse method here
     
     // public methods
     public String GetUrlPack(int index) {

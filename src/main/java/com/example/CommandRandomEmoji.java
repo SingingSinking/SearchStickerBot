@@ -1,44 +1,29 @@
 package com.example;
 
-import java.util.ArrayList;
-
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 public class CommandRandomEmoji implements Action{
-    private MapPack allPack;
     
     @Override
     public SendMessage handle(Update update) {
         var msg = update.getMessage();
         var chatId = msg.getChatId().toString();
 
-        //Создаем массив рандомных слов
-        ArrayList<String> randomWords = GetRandomWord();
-        //Сайт упал
-        if (randomWords == null) return new SendMessage(chatId, "Наблюдаются сбои в работе команды 🤧\nУже решаем проблему, ожидайте");
+        //Случайные номаера страницы и пака на странице
+        int randomNumPage = 1 + (int) ( Math.random() * 79 );
+        int randomNumPack = 1 + (int) ( Math.random() * 19 );
 
-        //Получаем паки по первому слову из randomWords
-        allPack = GetPackByWord(randomWords.get(0));
-        //Сайт упал
-        if (allPack == null) return new SendMessage(chatId, "Наблюдаются сбои в работе команды 🤧\nУже решаем проблему, ожидайте");
+        Website chpicEmoji = new Website("https://chpic.su/ru/emojis/?page=" + randomNumPage, "chpicRandomEmoji");
+        if (chpicEmoji.GetStatus() == false) 
+            return new SendMessage(chatId, "Наблюдаются сбои в работе команды 🤧\nУже решаем проблему, ожидайте");
 
-        //Если по первому слову не нашлось набора с эмоджи
-        if (allPack.SizePack() == 0){
+        //Парсер
+        Pack pack =  GetRandomPack(chpicEmoji, randomNumPack);
 
-            //Удаляем первое слово потому что по нему не нашлось паков
-            randomWords.remove(0);
-            
-            //Подставляем слова пока не найдется хотя бы один набор эмоджи
-            for (String word : randomWords) {
-                allPack = GetPackByWord(word);
-                //Выход из цикла если нашелся хотя бы один пак
-                if (allPack.SizePack()!=0) break;
-            }
-        }
         StringBuilder info = new StringBuilder();
-        String stickerUrl = allPack.GetUrlPack(0);
-        String stickerName =allPack.GetNamePack(0);
+        String stickerUrl = pack.GetUrl();
+        String stickerName = pack.GetName();
 
         //Экранируем все спец. символы, иначе телеграм не будет их учитывать и ссылка потеряет часть символов
         stickerUrl = ShieldStr(stickerUrl);
@@ -58,45 +43,45 @@ public class CommandRandomEmoji implements Action{
         return sendMessage;
     }
     
+
+
+    private Pack GetRandomPack(Website htmlDom, int randomNumPack) {
+        String urlPack =
+                    "t.me/addemoji/" + htmlDom.GetAllHtmlPage().getElementsByClass("titleStr").get(randomNumPack).child(1).getElementsByTag("a").attr("href");
+        urlPack = urlPack.replace("/ru/emojis/", "");
+        urlPack = urlPack.substring(0, urlPack.length() - 1);
+
+        String namePack = htmlDom.GetAllHtmlPage().getElementsByClass("titleStr").get(randomNumPack).child(1)
+                    .text();
+
+        // String urlImgPack = "https://chpic.su"
+        //         + htmlDom.GetAllHtmlPage().getElementsByClass("images").get(randomNumPack).select("img").attr("src");
+
+        return new Pack(namePack, urlPack, null);
+    }
+
+
+
     //метод экранирует строку
     private String ShieldStr(String str){
-        return str.replaceAll("\\(", "%28").replaceAll("\\)", "%29").replaceAll("_", "%5f").replace(".", "\\.");
-    }
-
-
-    private MapPack GetPackByWord(String randomWords) {
-        Website chpicSite = new Website("https://chpic.su/ru/stickers/search/" + randomWords + "/?searchModule=emojis", "chpicEmoji");
-        return new MapPack(chpicSite);
-    }
-
-    private ArrayList<String> GetRandomWord() {
-        //Сайт с рандомными словами (каждый раз разные слова по одной и той же ссылке)
-        //kreeklySite всегда возвращает 20 слов
-        Website kreeklySite = new Website("https://www.kreekly.com/random/noun/", "kreekly");
-
-        ArrayList<String> words = new ArrayList<>();
-        if (kreeklySite.GetStatus() == true){
-            int countWords = kreeklySite.GetAllHtmlPage().getElementsByClass("dict-word").size();
-            for (int i = 0; i<countWords; i++){
-
-                String word =kreeklySite.GetAllHtmlPage().
-                getElementsByClass("dict-word").
-                get(i).child(2).text();
-
-                words.add(word);
-            }
-        } else return null;
-
-        return words;
+        return str.replaceAll("\\(", "%28")
+        .replaceAll("\\)", "%29")
+        .replaceAll("_", "%5f")
+        .replace(".", "\\.")
+        .replaceAll("-", "%2d")
+        .replaceAll("\\|", "%7c")
+        .replaceAll("#", "%23")
+        .replaceAll("!", "%21");
     }
 
     @Override
     public SendMessage callback(Update update) {
         return handle(update);
     }
+
     @Override
     public MapPack getPack() {
         // TODO Auto-generated method stub
-        return allPack;
+        return null;
     }
 }
