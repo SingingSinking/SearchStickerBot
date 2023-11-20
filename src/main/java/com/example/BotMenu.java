@@ -48,6 +48,7 @@ public class BotMenu extends TelegramLongPollingBot {
         if (update.hasMessage()) {
             
             AddUserInfoToLog(update);
+            DatabaseConnectionTester.addUsername(username);
             String key = update.getMessage().getText();
             String chatId = update.getMessage().getChatId().toString();
 

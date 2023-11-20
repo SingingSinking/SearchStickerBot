@@ -11,7 +11,9 @@ public class Main {
     public static void main(String[] args) throws TelegramApiException, IOException {
         var tg = new TelegramBotsApi(DefaultBotSession.class);
         String logFilePath = "user_requests.log"; // путь к файлу
-
+        
+        DatabaseConnectionTester.testDatabaseConnection();
+        
         var actions = Map.of(
                 "/start", new CommandStart(),
                 "/searchsticker", new CommandSearchStickers("/search"),
@@ -20,6 +22,7 @@ public class Main {
                 "/randomemoji", new CommandRandomEmoji(),
                 "/botinfo", new CommandBotInfo()
         );
+
         tg.registerBot(new BotMenu(actions, "@Search_Stiker_bot", "6670951712:AAG7SQr3bB0soMaaZIW0xcjr6skoXlg4LS4", logFilePath));
     }
 }
