@@ -6,7 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class CommandRandomSticker implements Action{
     @Override
     public SendMessage handle(Update update) {
-        var msg = update.getMessage();
+        var msg = update.getCallbackQuery().getMessage();
         var chatId = msg.getChatId().toString();
 
         //Случайные номаера страницы и пака на странице
@@ -28,7 +28,7 @@ public class CommandRandomSticker implements Action{
         stickerUrl = ShieldStr(stickerUrl);
         stickerName = ShieldStr(stickerName);
 
-        info.append("Новые эмоджи для вас 😋:").append("\n");
+        info.append("Новые стикеры для вас 😋:").append("\n");
         info.append("👉Название: ").append(stickerName).append("\n");
         info.append("   [\\[Открыть\\]]").append("(" + stickerUrl + ")").append("\n");
         info.append("\n");

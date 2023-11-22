@@ -7,7 +7,7 @@ public class CommandRandomEmoji implements Action{
     
     @Override
     public SendMessage handle(Update update) {
-        var msg = update.getMessage();
+        var msg = update.getCallbackQuery().getMessage();
         var chatId = msg.getChatId().toString();
 
         //Случайные номаера страницы и пака на странице

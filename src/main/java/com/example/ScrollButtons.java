@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-public class AllButonReaction {
+public class ScrollButtons {
     Update update;
     //Пак со стикерами (уже заполненый из прошлой команды)
     MapPack allPack;
@@ -23,7 +23,7 @@ public class AllButonReaction {
     private int countPage;
 
 
-    public AllButonReaction(Update update, MapPack pack, int counterPage) {
+    public ScrollButtons(Update update, MapPack pack, int counterPage) {
         //Сначала выставляем все данные для работы кнопок
         if (pack!=null) allPack = pack;
         this.update = update;
@@ -41,7 +41,6 @@ public class AllButonReaction {
 
         //Если нажата кнопка дальше
         if (callBackData.equals("nextButton")){
-            //System.out.println("counterPage в классе: " + counterPage);
             //Вычисляем какие паки нужно выводить в зависимости от счетчика страницы
             int startElement = (counterPage * countPacksOnPage) - countPacksOnPage;
             int endElement = counterPage * countPacksOnPage;

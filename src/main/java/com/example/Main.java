@@ -12,14 +12,19 @@ public class Main {
         var tg = new TelegramBotsApi(DefaultBotSession.class);
         String logFilePath = "user_requests.log"; // путь к файлу
 
-        var actions = Map.of(
+        var actionsCommand = Map.of(
                 "/start", new CommandStart(),
-                "Поиск стикеров", new CommandSearchStickers("/search"),
-                "Случайный стикер", new CommandRandomSticker(),
-                "Поиск эмоджи", new CommandSearchEmoji("/search"),
-                "Случайный эмоджи", new CommandRandomEmoji(),
-                "Информация о боте", new CommandBotInfo()
+                "/botinfo", new CommandBotInfo(),
+                
+                "searchStickersBtn", new CommandSearchStickers("/search"),
+                "randomStickersBtn", new CommandRandomSticker(),
+
+                "searchEmojiBtn", new CommandSearchEmoji("/search"),
+                "randomEmojiBtn", new CommandRandomEmoji(),
+                
+                "upscalePhotoBtn", new CommandUpscalePhoto(),
+                "convertPhotoBtn", new CommandConvertPhoto()
         );
-        tg.registerBot(new BotMenu(actions, "@Search_Stiker_bot", "6670951712:AAG7SQr3bB0soMaaZIW0xcjr6skoXlg4LS4", logFilePath));
+        tg.registerBot(new BotMenu(actionsCommand, "@Search_Stiker_bot", "6670951712:AAG7SQr3bB0soMaaZIW0xcjr6skoXlg4LS4", logFilePath));
     }
 }
