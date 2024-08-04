@@ -11,7 +11,6 @@ public class CommandBotInfo implements Action {
         var chatId = msg.getChatId().toString();
         
         var text = new StringBuilder();
-        text.append("Данный бот разработан @GanzaPaz и @Singingsinking, двумя студентами Санкт-Петербургского государственного электротехнического университета «ЛЭТИ».").append("\n");
         text.append("Если по вашему запросу бот не находит нужные стикеры, попробуйте изменить запрос или использовать другой язык для поиска.");
         
         final SendMessage sendMessage = new SendMessage();
